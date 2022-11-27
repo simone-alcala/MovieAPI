@@ -21,17 +21,66 @@ export class MovieService {
   }
 
   async findAll() {
-    const movies = await this.movieRepository.find();
-    return movies;
+    const movies = await this.movieRepository.find({  
+      relations: ['movieCategories.category']
+    });
+    
+    const result = [];
+
+    movies.map( movie => {
+      const categories = [];
+      movie.movieCategories.map( movieCategory => {
+        categories.push({
+          id: movieCategory.categoryId,
+          name: movieCategory.category.name
+        });         
+      });
+      result.push ({
+        id: movie.id,
+        title: movie.title,
+        description: movie.description,
+        year: movie.year,
+        posterUrl: movie.posterUrl,
+        trailerUrl: movie.trailerUrl,
+        categories
+      });
+    })
+
+    return result;
   }
 
   async findOne(id: number) {
     const searchId: number = id | 0;
     const movie = await this.movieRepository.findOne({ 
-      where: { id: searchId }
+      where: { id: searchId },
+      relations: ['movieCategories.category'] , 
     });
 
-    return movie;
+    if(!movie) {
+      return movie;
+    }
+
+    const categories = [];
+    
+    movie.movieCategories?.map( movieCategory => {
+      categories.push({
+        id: movieCategory.categoryId,
+        name: movieCategory.category.name
+      });         
+    });
+
+    const result = {
+      id: movie.id,
+      title: movie.title,
+      description: movie.description,
+      year: movie.year,
+      posterUrl: movie.posterUrl,
+      trailerUrl: movie.trailerUrl,
+      categories
+    };
+
+    return result;
+    
   }
 
   async findByIdOrFail(id: number) {
@@ -59,7 +108,7 @@ export class MovieService {
     if (result.affected === 0) {
       throw new InternalServerErrorException('Movie was not deleted');
     }
-    
+
     return { movieId: id, affectedRegisters: result.affected };
   }
 
