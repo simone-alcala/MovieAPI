@@ -38,6 +38,8 @@ JWT_SECRET=
 
 POSTGRES_HOST=
 # database host
+# Locally, use: localhost
+# With Docker, use: db_movie
 
 POSTGRES_USERNAME=
 # database username
@@ -46,16 +48,16 @@ POSTGRES_PASSWORD=
 # database password
 
 POSTGRES_PORT=
-# database port
+# database port, POSTGRES default: 5432
 
 POSTGRES_DATABASE=
 # database name
 
 DATABASE_URL=
-#postgresql://<user>:<password>@<host>:<port>/<database_name>
+# postgresql://<user>:<password>@<host>:<port>/<database_name>
 
 PORT=
-# application port
+# application port, default is 3000
 ```
 
 ## Installation
@@ -64,11 +66,11 @@ PORT=
 $ npm install
 ```
 
-## Database
+## Create database locally
 
 ```bash
-$ sudo -i -u postgres
-$ createdb database_name
+$ psql -U postgres -p 5432 -h localhost
+$ create database database_name
 ```
 
 ## Running the app locally
@@ -87,7 +89,15 @@ $ npm run start:prod
 ## Running the app with Docker
 
 ```bash
-$ docker compose up
+$ docker-compose up
+```
+
+## Create database on Docker
+
+```bash
+$ psql -U postgres -p 2345 -h localhost
+$ create database database_name
+$ docker-compose down && docker-compose up
 ```
 
 #
@@ -99,5 +109,14 @@ $ docker compose up
 - SQL: since 01/2012
 - Docker: since 10/2022
 - Redis: since 11/2022
+
+#
+
+## References
+- https://typeorm.io
+- https://docs.nestjs.com
+- https://docs.docker.com/engine/install/ubuntu/
+- https://www.youtube.com/watch?v=YHpG6t91oW8
+- https://www.youtube.com/watch?v=QOMiiZ8CUYM
 
 #
