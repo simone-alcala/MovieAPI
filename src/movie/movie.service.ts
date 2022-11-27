@@ -5,11 +5,14 @@ import { Movie } from './entities/movie.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 
+import { MovieCategory } from './../movie-category/entities/movie-category.entity';
+
 @Injectable()
 export class MovieService {
 
   constructor (
-    @Inject('MOVIE_REPOSITORY') private movieRepository: Repository<Movie>
+    @Inject('MOVIE_REPOSITORY') private movieRepository: Repository<Movie>,
+    @Inject('MOVIE_CATEGORY_REPOSITORY') private movieCategoryRepository: Repository<MovieCategory>
   ) {}
 
   async create(createMovieDto: CreateMovieDto) {
@@ -50,11 +53,22 @@ export class MovieService {
 
   async remove(id: number) {
     await this.findByIdOrFail(id);
+    await this.findByMovieIdAndFail(id);
+
     const result = await this.movieRepository.delete(id);
     if (result.affected === 0) {
       throw new InternalServerErrorException('Movie was not deleted');
     }
+    
     return { movieId: id, affectedRegisters: result.affected };
+  }
+
+  async findByMovieIdAndFail(movieId: number) {
+    const movieCategory = await this.movieCategoryRepository.findOneBy({ movieId });
+    if (movieCategory) {
+      throw new ConflictException('Movie ID related to MovieCategory');
+    }
+    return movieCategory;
   }
   
 }

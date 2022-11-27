@@ -5,11 +5,14 @@ import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
+import { MovieCategory } from './../movie-category/entities/movie-category.entity';
+
 @Injectable()
 export class CategoryService {
   
   constructor (
-    @Inject('CATEGORY_REPOSITORY') private categoryRepository: Repository<Category>
+    @Inject('CATEGORY_REPOSITORY') private categoryRepository: Repository<Category>,
+    @Inject('MOVIE_CATEGORY_REPOSITORY') private movieCategoryRepository: Repository<MovieCategory>
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
@@ -48,20 +51,33 @@ export class CategoryService {
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
     await this.findByIdOrFail(id);
     await this.findByNameAndFail(updateCategoryDto.name, id);
+
     const result = await this.categoryRepository.update(id, updateCategoryDto);
     if (result.affected === 0) {
       throw new InternalServerErrorException('Category was not updated');
     }
+
     return { categoryId: id, affectedRegisters: result.affected };
   }
 
   async remove(id: number) {
     await this.findByIdOrFail(id);
+    await this.findByCategoryIdAndFail(id);
+
     const result = await this.categoryRepository.delete(id);
     if (result.affected === 0) {
       throw new InternalServerErrorException('Category was not deleted');
     }
+
     return { categoryId: id, affectedRegisters: result.affected };
+  }
+
+  async findByCategoryIdAndFail(categoryId: number) {
+    const movieCategory = await this.movieCategoryRepository.findOneBy({ categoryId });
+    if (movieCategory) {
+      throw new ConflictException('Category ID related to MovieCategory');
+    }
+    return movieCategory;
   }
 
 }
