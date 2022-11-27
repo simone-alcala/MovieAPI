@@ -21,6 +21,7 @@ async function bootstrap() {
     .setDescription('Movie API routes')
     .setVersion('1.0')
     .addTag('movie')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
