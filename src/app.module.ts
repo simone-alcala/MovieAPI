@@ -5,9 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
+import { MovieModule } from './movie/movie.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, AuthModule],
+  imports: [ConfigModule.forRoot(), DatabaseModule, AuthModule, MovieModule],
   controllers: [AppController],
   providers: [AppService],
 })
