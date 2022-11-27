@@ -64,6 +64,13 @@ PORT=
 $ npm install
 ```
 
+## Database
+
+```bash
+$ sudo -i -u postgres
+$ createdb database_name
+```
+
 ## Running the app locally
 
 ```bash
